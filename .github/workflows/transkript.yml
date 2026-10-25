@@ -1,0 +1,36 @@
+name: Close-Anrufe transkribieren
+
+on:
+  schedule:
+    - cron: "40 7-20 * * *"   # stündlich, ca. 8:40 bis 21:40 deutscher Zeit
+  workflow_dispatch: {}        # manuell starten über "Run workflow"
+
+concurrency:
+  group: transkript
+  cancel-in-progress: false
+
+jobs:
+  transkript:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Sprachmodell aus dem Cache holen
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: whisper-small-v1
+
+      - name: Pakete installieren
+        run: pip install -r requirements.txt
+
+      - name: Transkribieren
+        env:
+          CLOSE_API_KEY: ${{ secrets.CLOSE_API_KEY }}
+        run: python transkript.py
