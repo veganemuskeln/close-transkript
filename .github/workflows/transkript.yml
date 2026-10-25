@@ -3,7 +3,11 @@ name: Close-Anrufe transkribieren
 on:
   schedule:
     - cron: "40 7-20 * * *"   # stündlich, ca. 8:40 bis 21:40 deutscher Zeit
-  workflow_dispatch: {}        # manuell starten über "Run workflow"
+  workflow_dispatch:
+    inputs:
+      stunden:
+        description: "Wie viele Stunden zurück (Test)"
+        default: "3"
 
 concurrency:
   group: transkript
@@ -12,7 +16,7 @@ concurrency:
 jobs:
   transkript:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
 
@@ -33,4 +37,5 @@ jobs:
       - name: Transkribieren
         env:
           CLOSE_API_KEY: ${{ secrets.CLOSE_API_KEY }}
+          LOOKBACK_H: ${{ inputs.stunden || '3' }}
         run: python transkript.py
