@@ -2,12 +2,12 @@ name: Close-Anrufe transkribieren
 
 on:
   schedule:
-    - cron: "40 7-20 * * *"   # stündlich, ca. 8:40 bis 21:40 deutscher Zeit
+    - cron: "*/20 7-20 * * *"   # alle 20 Min., ca. 8 bis 22 Uhr deutscher Zeit
   workflow_dispatch:
     inputs:
       stunden:
         description: "Wie viele Stunden zurück (Test)"
-        default: "3"
+        default: "12"
 
 concurrency:
   group: transkript
@@ -37,5 +37,5 @@ jobs:
       - name: Transkribieren
         env:
           CLOSE_API_KEY: ${{ secrets.CLOSE_API_KEY }}
-          LOOKBACK_H: ${{ inputs.stunden || '3' }}
+          LOOKBACK_H: ${{ inputs.stunden || '12' }}
         run: python transkript.py
